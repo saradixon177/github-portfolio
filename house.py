@@ -1,31 +1,65 @@
 import turtle
 from turtle import *
 
-def square(turtle, length, xloc, yloc):
-    turtle.penup()
-    turtle.goto(xloc, yloc)
-    
-    turtle.pendown()
-    
+def create_colored_triangle(t, length, xloc, yloc, color): 
+    t.penup()
+    t.goto(xloc, yloc)
+    t.pendown()
+    t.fillcolor(color)
+    t.begin_fill() 
+    for i in range(3):
+        t.forward(length)
+        t.left(120)
+    t.end_fill()
+
+
+def create_square(t, length, xloc, yloc, color):
+    t.penup()
+    t.goto(xloc, yloc)
+    t.pendown()
+    t.fillcolor(color)
+    t.begin_fill() 
     for i in range(4):
-        turtle.forward(length)
-        turtle.right(90)
-  
+        t.forward(length)
+        t.right(90)   
+    t.end_fill()  
 
-def main():
-    space = Screen()
-    t1 = Turtle()
-    square(t1, 50, -100, 0)
-    t2 = Turtle()
-    square(t2, 50, 0, 0)
-    t3 = Turtle()
-    square(t3, 50, 100, 0)
+def create_house(t, length, x, y):
+    # Draw the main blue structure
+    create_square(t, length, x, y, "cyan")
     
-   
-    # pick up the pen and go to (-100,0)
+    # FIX 2: Added the roof back in!
+    create_colored_triangle(t, length, x, y, "red")
 
-    # loop 3 times drawing squares with a length of 50
-    # that are 100 pixels apart
+    # To put a door at the bottom, y needs to be lowered by the house length.
+    door_length = length * 0.3
+    door_x = x + (length * 0.35)
+    door_y = y - (length * 0.7) # Moves it to the bottom of the square
+
+    create_square(t, door_length, door_x, door_y, "white")
+
+def create_mountain(t, length, x, y): 
+    create_colored_triangle(t, length, x, y, "brown")
+    
+    cap_length = length * 0.3
+    peak_x = x + (length * 0.35) 
+    peak_y = y + (length * 0.6)
+    
+    create_colored_triangle(t, cap_length, peak_x, peak_y, "white")
+
+def main(): 
+    screen = Screen()
+    screen.bgcolor("skyblue")
+
+    artist = Turtle()
+    artist.speed(0) 
+
+    # Draw mountain in the back
+    create_mountain(artist, 300, -200, -100)
+
+    # Draw house in the front
+    create_house(artist, 100, 50, 0)
+    
+    screen.exitonclick()
 
 main()
-
