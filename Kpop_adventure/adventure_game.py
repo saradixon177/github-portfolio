@@ -1,0 +1,122 @@
+# copy this and make a kpop themed adventure game 
+class Treasure: 
+    def __init__(self, name, points):
+        self.name = name 
+        self.points = points
+
+class Player: 
+    def __init__(self, name, treasure_list, location):
+        self.name = name
+        self.treasure_list = treasure_list 
+        self.location = location 
+
+    def points(self):
+        total_points = 0 
+        for treasure in self.treasure_list: 
+            total_points += treasure.points 
+        return total_points
+
+    def choose_dir(self):
+        directions_comma = ",".join(self.location.dir_dictionary.keys()) 
+        choice = input(f"Which way? {directions_comma}: ").lower() 
+        
+        if choice in self.location.dir_dictionary: 
+            self.location = self.location.dir_dictionary[choice] 
+            print(f"Dancing to {self.location.name}...") 
+            return True
+        else: 
+            print("You can't dance that way.") 
+            return False
+
+    def __str__(self):
+        items = ", ".join([t.name for t in self.treasure_list]) if self.treasure_list else "None"
+        return f"--- [ {self.name} Status ] ---\nCoins/Items: {items}\nTotal Score: {self.points()}\n"
+
+class Room: 
+    def __init__(self, name, treasure_list, dir_dictionary=None):
+        self.name = name
+        self.treasure_list = treasure_list 
+        self.dir_dictionary = dir_dictionary if dir_dictionary else {}
+
+    def set_dir_dict(self, dictionary):
+        self.dir_dictionary = dictionary
+
+    def transfer_treasure(self, player):
+        if self.treasure_list: 
+            print(f"Yay! You found: {', '.join(t.name for t in self.treasure_list)}")
+            player.treasure_list += self.treasure_list 
+            self.treasure_list = [] 
+        else:
+            print("This area is empty of coins.")
+
+    def __str__(self):
+        return f"Current Location: {self.name}"
+
+# --- THE GAME CLASS ---
+
+class Game:
+    def __init__(self):
+        # 1. Create Treasure objects
+        coin = Treasure("Gold Coin", 10)
+        photo_card = Treasure("Photo Card", 20)
+        idol_photo = Treasure("Idol Photo", 50)
+
+
+        # 2. Create Room objects
+        home_town = Room("Home Town", [coin])
+        bts_stage = Room("BTS Stage", [photo_card])
+        blackpink_house = Room("Blackpink's House", [idol_photo, coin])
+        hidden_catwalk = Room("Hidden Catwalk", []) 
+        exo_backstage = Room("EXO Backstage", [photo_card, coin]) 
+        ticketmaster_war = Room("Ticketmaster War", [])
+
+        # 3. Create direction dictionaries and call set_dir_dict
+        home_town.set_dir_dict({"west": bts_stage, "down": hidden_catwalk, "east": blackpink_house})
+        bts_stage.set_dir_dict({"east": home_town})
+        blackpink_house.set_dir_dict({"west": home_town , "down": hidden_catwalk})
+        hidden_catwalk.set_dir_dict({"up": home_town, "down": exo_backstage})
+        exo_backstage.set_dir_dict({"up": hidden_catwalk, "down": ticketmaster_war})
+        ticketmaster_war.set_dir_dict({"up": exo_backstage})
+
+        # 4. Create Player and place in starting room
+        self.player = Player("Kpop Trainee", [], home_town)
+
+        # 5. Set exit room
+        self.exit_room = ticketmaster_war
+
+        # 6. Set win points
+        self.win_points = 60
+
+    def play(self):
+        # Print starting location
+        print(f"Welcome to the Kpop Adventure! You must dance your way to the Ticketmaster War! {self.player.location}")
+
+        # Game Loop
+        while True:
+            # Check for win condition
+            if self.player.location == self.exit_room and self.player.points() >= self.win_points:
+                print(f"Congratulations {self.player.name} on winning the game! You danced your way to tickets!")
+                break
+            
+            # Check for "found exit but not enough points"
+            if self.player.location == self.exit_room and self.player.points() < self.win_points:
+                print("You found the exit room but do not have enough points to win! Go find more coins!")
+
+            # Ask player to choose a direction
+            moved = False
+            while not moved:
+                moved = self.player.choose_dir()
+
+            # Print new room info
+            print(self.player.location)
+
+            # Move treasure
+            self.player.location.transfer_treasure(self.player)
+
+            # Print player information
+            print(self.player)
+
+# Start the game
+if __name__ == "__main__":
+    my_game = Game()
+    my_game.play()
