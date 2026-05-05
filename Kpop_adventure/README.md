@@ -7,7 +7,7 @@ I am learning OOP and decided to take the typical game format and create a kpop 
 ```
 ├── README.md
 ├── adventure_game.py            # Python code that runs through the game
-
+```
 ## Tools Used
 - **Python**
 - **VS Code**
